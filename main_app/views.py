@@ -119,9 +119,9 @@ def signup(request):
             error_message = 'Invalid sign up- try again'
     # this if for GET request
     # assuming our user clicked on "signup" from the navbar
-    form = UserCreationForm() 
+    form = UserCreationForm()  # clears for
     context = {'form': form, 'error_message': error_message}
-    return render(request, 'registration/signup.html', context)
+    return render(request, 'registration/signup.html', context) # re-renders new signup form
 
 
     
