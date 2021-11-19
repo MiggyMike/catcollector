@@ -1,11 +1,18 @@
 from django.db.models import fields
 from django.views.generic.detail import DetailView
-from .models import Cat, Toy
+from .models import Cat, Toy, Photo
 from django.shortcuts import render, redirect
 from django.views.generic import ListView
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from .forms import FeedingForm
 from main_app import models
+
+import boto3
+import uuid
+
+S3_BASE_URL = 'https://s3-us-west-1.amazonaws.com/'
+BUCKET = 'catcollector-mj-photo-uploads'
+
 # from django.http import HttpResponse  # generates a response to client, you just have to pass
 
 # Create your views here.
@@ -73,6 +80,23 @@ def add_feeding(request, pk):
 def assoc_toy(request, cat_id, toy_id):
     Cat.objects.get(id=cat_id).toys.add(toy_id)
     return redirect('detail', pk=cat_id)
+
+def add_photo(request, pk):
+    photo_file = request.FILES.get('photo-file')
+    if photo_file:
+        s3 = boto3.client('s3')
+        # need a unique "key" for S3 / needs image file extension too
+        key = uuid.uuid4().hex[:6] + photo_file.name[photo_file.name.rfind('.'):]
+
+        try:
+            s3.upload_fileobj(photo_file, BUCKET, key)
+            url = f'{S3_BASE_URL}{BUCKET}/{key}'
+            photo = Photo(url=url, cat_id=pk)
+            photo.save()
+        except Exception as error:
+            print(f'an error occured uploading to AWS S3')
+            print(error)
+    return redirect('detail', pk=pk)
     
 # class-based-view set up
 class CatIndex(ListView):
