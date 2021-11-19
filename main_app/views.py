@@ -1,4 +1,5 @@
 from django.db.models import fields
+from django.db.models.query import QuerySet
 from django.views.generic.detail import DetailView
 from .models import Cat, Toy, Photo
 from django.shortcuts import render, redirect
@@ -129,6 +130,11 @@ def signup(request):
 class CatIndex(ListView):
     model = Cat
     template_name = 'cats/index.html'
+    
+    # display only the user's cats
+    def get_queryset(self):
+        queryset = Cat.objects.filter(user=self.request.user)
+        return queryset
 
 class CatCreate(CreateView):
     model = Cat
