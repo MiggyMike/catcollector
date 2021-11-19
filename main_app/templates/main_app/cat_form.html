@@ -1,0 +1,29 @@
+{% extends 'base.html' %} {% block content %}
+
+<!-- NEW if/else block -->
+{% if object %}
+<h1>Edit <span class="teal">{{object.name}}</span></h1>
+{% else %}
+<h1>Add Cat</h1>
+{% endif %}
+
+<form action="" method="post">
+  <!-- must use this for every form for security -->
+  {% csrf_token %}
+  <table>
+    {{form.as_table}}
+  </table>
+
+  <!-- {% if object %}
+  <input type="submit" value="Update Cat" class="btn blue" />
+  {% else %}
+  <input type="submit" value="Add Cat" class="btn blue" />
+  {% endif %} -->
+  <!-- <input type="submit" value="Add Cat" class="btn blue" /> -->
+  <input
+    class="btn blue"
+    type="submit"
+    value="{% if object %} Update Cat {% else %} Add Cat {% endif %}"
+  />
+  {% endblock %}
+</form>
