@@ -20,4 +20,6 @@ urlpatterns = [
     path('toys/<int:pk>/delete/', views.ToyDelete.as_view(), name='toys_delete'),
     path('cats/<int:cat_id>/assoc_toy/<int:toy_id>/', views.assoc_toy, name='assoc_toy'),
     path('cats/<int:pk>/add_photo/', views.add_photo, name='add_photo'),
+    # Unfortunately, Django's built-in auth does not provide a URL or view for signing up new users.
+    path('accounts/signup/', views.signup, name='signup')
 ]

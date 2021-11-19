@@ -5,7 +5,9 @@ from django.shortcuts import render, redirect
 from django.views.generic import ListView
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from .forms import FeedingForm
-from main_app import models
+
+from django.contrib.auth import login # creates session cookie and session in DT
+from django.contrib.auth.forms import UserCreationForm
 
 import boto3
 import uuid
@@ -97,8 +99,33 @@ def add_photo(request, pk):
             print(f'an error occured uploading to AWS S3')
             print(error)
     return redirect('detail', pk=pk)
+
+# this view fn handles both GET and POST request
+def signup(request):
+    error_message = ''
+    # checks to see if method id POST
+    if request.method == 'POST':
+        # handle the creation of a new user
+        form = UserCreationForm(request.POST)
+        if form.is_valid():
+            # this iwll add the user to the database
+            user = form.save()
+            # this is how e log a use in via code
+            # creates session entry in DB 
+            # and persist the session site wide until the user logs out
+            login(request, user)
+            return redirect('index')
+        else:   
+            error_message = 'Invalid sign up- try again'
+    # this if for GET request
+    # assuming our user clicked on "signup" from the navbar
+    form = UserCreationForm() 
+    context = {'form': form, 'error_message': error_message}
+    return render(request, 'registration/signup.html', context)
+
+
     
-# class-based-view set up
+# CBV: class-based-view set up
 class CatIndex(ListView):
     model = Cat
     template_name = 'cats/index.html'
