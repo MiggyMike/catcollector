@@ -106,9 +106,18 @@ class CatIndex(ListView):
 class CatCreate(CreateView):
     model = Cat
     # tell which fields we want to allow the user to create
-    fields = '__all__'
+    # fields = '__all__' # changed to tuple bc it pulls USER and TOY model
+    fields = ('name', 'breed', 'description', 'age')
     # for form submission to create the cat - not best practice -- BEST PRACTICE to add get_absolute_url in Model
     # success_url = '/cats/' 
+
+    # This inherited method is called when a
+    # valid cat form is being submitted
+    def form_valid(self, form):
+        # Assign the logged in user (self.request.user)
+        form.instance.user = self.request.user # form.instance is the cat
+        # Let the CreateView do its job as usual
+        return super().form_valid(form)
 
 class CatUpdate(UpdateView):
     model = Cat
