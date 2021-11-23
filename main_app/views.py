@@ -10,6 +10,9 @@ from .forms import FeedingForm
 from django.contrib.auth import login # creates session cookie and session in DT
 from django.contrib.auth.forms import UserCreationForm
 
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.decorators import login_required
+
 import boto3
 import uuid
 
@@ -53,6 +56,7 @@ def about(request):
 #     cats = Cat.objects.all()
 #     return render(request, 'cats/index.html', { 'cats': cats })
 
+@login_required
 def cats_detail(request, pk): #changed cat_id to pk
     cat = Cat.objects.get(id=pk) #changed cat_id to pk
     
@@ -83,6 +87,10 @@ def add_feeding(request, pk):
 def assoc_toy(request, cat_id, toy_id):
     Cat.objects.get(id=cat_id).toys.add(toy_id)
     return redirect('detail', pk=cat_id)
+
+# def unassoc_toy(request, cat_id, toy_id):
+#     Cat.objects.get(id=cat_id).toys.remove(toy_id)
+#     return redirect('detail', pk=cat_id)
 
 def add_photo(request, pk):
     photo_file = request.FILES.get('photo-file')
@@ -127,7 +135,7 @@ def signup(request):
 
     
 # CBV: class-based-view set up
-class CatIndex(ListView):
+class CatIndex(LoginRequiredMixin, ListView):
     model = Cat
     template_name = 'cats/index.html'
     
@@ -136,7 +144,7 @@ class CatIndex(ListView):
         queryset = Cat.objects.filter(user=self.request.user)
         return queryset
 
-class CatCreate(CreateView):
+class CatCreate(LoginRequiredMixin, CreateView):
     model = Cat
     # tell which fields we want to allow the user to create
     # fields = '__all__' # changed to tuple bc it pulls USER and TOY model
@@ -152,37 +160,37 @@ class CatCreate(CreateView):
         # Let the CreateView do its job as usual
         return super().form_valid(form)
 
-class CatUpdate(UpdateView):
+class CatUpdate(LoginRequiredMixin, UpdateView):
     model = Cat
     fields = ('breed', 'description', 'age')
     # or 
     # fields = '__all__'
 
-class CatDelete(DeleteView):
+class CatDelete(LoginRequiredMixin, DeleteView):
     model = Cat
     success_url = '/cats/'
 
 
-class ToyCreate(CreateView):
+class ToyCreate(LoginRequiredMixin, CreateView):
     model = Toy
     fields = ('name', 'color')
 
 
-class ToyUpdate(UpdateView):
+class ToyUpdate(LoginRequiredMixin, UpdateView):
     model = Toy
     fields = ('name', 'color')
 
 
-class ToyDelete(DeleteView):
+class ToyDelete(LoginRequiredMixin, DeleteView):
     model = Toy
     success_url = '/toys/'
 
 
-class ToyDetail(DetailView):
+class ToyDetail(LoginRequiredMixin, DetailView):
     model = Toy
     template_name = 'toys/detail.html'
 
 
-class ToyList(ListView):
+class ToyList(LoginRequiredMixin, ListView):
     model = Toy
     template_name = 'toys/index.html'
