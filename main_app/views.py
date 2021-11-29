@@ -88,9 +88,9 @@ def assoc_toy(request, cat_id, toy_id):
     Cat.objects.get(id=cat_id).toys.add(toy_id)
     return redirect('detail', pk=cat_id)
 
-# def unassoc_toy(request, cat_id, toy_id):
-#     Cat.objects.get(id=cat_id).toys.remove(toy_id)
-#     return redirect('detail', pk=cat_id)
+def unassoc_toy(request, cat_id, toy_id):
+    Cat.objects.get(id=cat_id).toys.remove(toy_id)
+    return redirect('detail', pk=cat_id)
 
 def add_photo(request, pk):
     photo_file = request.FILES.get('photo-file')
